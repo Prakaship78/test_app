@@ -16,6 +16,8 @@ class _SearchPageState extends State<SearchPage> {
   var titleController = TextEditingController();
   String id;
 
+  var _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -38,94 +40,104 @@ class _SearchPageState extends State<SearchPage> {
               })
         ],
       ),
-      body: Container(
-        child: BlocListener<SearchBloc, SearchState>(
-          listener: (context, state) {
-            if (state is SearchErrorState) {
-              return Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text(state.message),
-              ));
-            }
-          },
-          child: BlocBuilder<SearchBloc, SearchState>(
-            builder: (context, state) {
-              if (state is SearchInitialState) {
-                return Container(
-                    padding: EdgeInsets.only(left: 10, right: 10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image(
-                          image: AssetImage('assets/logo.png'),
-                          width: 200,
-                          height: 200,
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        TextFormField(
-                          controller: titleController,
-                          decoration: InputDecoration(
-                              suffixIcon: FlatButton(
-                                onPressed: () {
-                                  searchBloc.add(
-                                      SearchMovieEvent(titleController.text));
-                                },
-                                child: Icon(
-                                  Icons.search,
-                                  color: Colors.white60,
+      body: Form(
+        key: _formKey,
+        child: Container(
+          child: BlocListener<SearchBloc, SearchState>(
+            listener: (context, state) {
+              if (state is SearchErrorState) {
+                return Scaffold.of(context).showSnackBar(SnackBar(
+                  content: Text(state.message),
+                ));
+              }
+            },
+            child: BlocBuilder<SearchBloc, SearchState>(
+              builder: (context, state) {
+                if (state is SearchInitialState) {
+                  return Container(
+                      padding: EdgeInsets.only(left: 10, right: 10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image(
+                            image: AssetImage('assets/logo.png'),
+                            width: 200,
+                            height: 200,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          TextFormField(
+                            controller: titleController,
+                            decoration: InputDecoration(
+                                suffixIcon: FlatButton(
+                                  onPressed: () {
+                                    searchBloc.add(
+                                        SearchMovieEvent(titleController.text));
+                                  },
+                                  child: Icon(
+                                    Icons.search,
+                                    color: Colors.white60,
+                                  ),
                                 ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
+                                enabledBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20)),
+                                    borderSide: BorderSide(
+                                        color: Colors.yellow,
+                                        style: BorderStyle.solid)),
+                                focusedBorder: OutlineInputBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20)),
                                   borderSide: BorderSide(
                                       color: Colors.yellow,
-                                      style: BorderStyle.solid)),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                                borderSide: BorderSide(
-                                    color: Colors.yellow,
-                                    style: BorderStyle.solid),
-                              ),
-                              hintText: 'Search Movie',
-                              labelText: 'Movie name',
-                              hintStyle: TextStyle(color: Colors.white)),
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                          width: 200,
-                          height: 50,
-                          child: FlatButton(
-                            shape: new RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            onPressed: () {
-                              searchBloc
-                                  .add(SearchMovieEvent(titleController.text));
+                                      style: BorderStyle.solid),
+                                ),
+                                hintText: 'Search Movie',
+                                labelText: 'Movie name',
+                                hintStyle: TextStyle(color: Colors.white)),
+                            style: TextStyle(color: Colors.white),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'You cannot leave this blank';
+                              }
                             },
-                            color: Colors.lightBlue,
-                            child: Text(
-                              "Search",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 18),
-                            ),
                           ),
-                        )
-                      ],
-                    ));
-              } else if (state is SearchLoadingState) {
-                return buildLoading();
-              } else if (state is SearchLoadedState) {
-                return buildSearchList(state.search);
-              } else if (state is SearchErrorState) {
-                return buildErrorUi(state.message);
-              }
-            },
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            width: 200,
+                            height: 50,
+                            child: FlatButton(
+                              shape: new RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20))),
+                              onPressed: () {
+                                if (_formKey.currentState.validate()) {
+                                  return searchBloc.add(
+                                      SearchMovieEvent(titleController.text));
+                                }
+                              },
+                              color: Colors.lightBlue,
+                              child: Text(
+                                "Search",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                              ),
+                            ),
+                          )
+                        ],
+                      ));
+                } else if (state is SearchLoadingState) {
+                  return buildLoading();
+                } else if (state is SearchLoadedState) {
+                  return buildSearchList(state.search);
+                } else if (state is SearchErrorState) {
+                  return buildErrorUi(state.message);
+                }
+              },
+            ),
           ),
         ),
       ),
