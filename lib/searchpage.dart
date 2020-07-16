@@ -72,8 +72,10 @@ class _SearchPageState extends State<SearchPage> {
                             decoration: InputDecoration(
                                 suffixIcon: FlatButton(
                                   onPressed: () {
-                                    searchBloc.add(
-                                        SearchMovieEvent(titleController.text));
+                                    if (titleController.text != null) {
+                                      return searchBloc.add(SearchMovieEvent(
+                                          titleController.text));
+                                    }
                                   },
                                   child: Icon(
                                     Icons.search,
