@@ -103,6 +103,7 @@ class _SearchPageState extends State<SearchPage> {
                               if (value.isEmpty) {
                                 return 'You cannot leave this blank';
                               }
+                              value = value.toUpperCase();
                             },
                           ),
                           SizedBox(
