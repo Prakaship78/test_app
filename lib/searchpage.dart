@@ -164,28 +164,39 @@ Widget buildErrorUi(String message) {
 }
 
 Widget buildSearchList(List<Search> search) {
-  return ListView.builder(
-    itemCount: search.length,
-    itemBuilder: (context, pos) {
-      return Padding(
-        padding: EdgeInsets.all(10),
-        child: InkWell(
-          child: ListTile(
-              leading: Image(
-                image: NetworkImage(search[pos].poster),
-              ),
-              title: Text(
-                '${search[pos].title} (${search[pos].year})',
-                style: TextStyle(fontSize: 18),
-              ),
-              subtitle: Text(search[pos].type)),
-          onTap: () {
-            navigateToSearchDetailPage(context, search[pos]);
-          },
+  if (search != null) {
+    return ListView.builder(
+      itemCount: search.length,
+      itemBuilder: (context, pos) {
+        return Padding(
+          padding: EdgeInsets.all(10),
+          child: InkWell(
+            child: ListTile(
+                leading: Image(
+                  image: NetworkImage(search[pos].poster),
+                ),
+                title: Text(
+                  '${search[pos].title} (${search[pos].year})',
+                  style: TextStyle(fontSize: 18),
+                ),
+                subtitle: Text(search[pos].type)),
+            onTap: () {
+              navigateToSearchDetailPage(context, search[pos]);
+            },
+          ),
+        );
+      },
+    );
+  } else {
+    return Container(
+      child: Center(
+        child: Text(
+          'No result Found ',
+          style: TextStyle(color: Colors.white, fontSize: 18),
         ),
-      );
-    },
-  );
+      ),
+    );
+  }
 }
 
 void navigateToSearchDetailPage(BuildContext context, Search search) {
